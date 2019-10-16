@@ -1,4 +1,4 @@
-package com.example.mobilnynadzorca;
+package com.example.mobilesupervisor_patientapp;
 
 import org.junit.Test;
 
