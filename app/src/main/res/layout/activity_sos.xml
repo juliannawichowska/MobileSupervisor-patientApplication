@@ -11,10 +11,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
-        android:layout_marginLeft="20dp"
         android:layout_marginTop="130dp"
         android:layout_marginEnd="20dp"
-        android:layout_marginRight="20dp"
         android:layout_marginBottom="130dp"
         android:background="@color/colorAccent"
         android:text="SOS"
@@ -39,7 +37,7 @@
         android:onClick="ShowResults"
         android:text="Sprawdź wyniki"
         android:visibility="visible"
-        app:layout_constraintBottom_toTopOf="@+id/button3"
+        app:layout_constraintBottom_toTopOf="@+id/sendChat"
         app:layout_constraintEnd_toStartOf="@+id/button4"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
@@ -47,7 +45,7 @@
         app:layout_constraintVertical_bias="0.011" />
 
     <Button
-        android:id="@+id/button3"
+        android:id="@+id/sendChat"
         android:layout_width="184dp"
         android:layout_height="184dp"
         android:layout_marginStart="8dp"
@@ -96,7 +94,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toEndOf="@+id/button4"
-        app:layout_constraintTop_toBottomOf="@+id/button3"
+        app:layout_constraintTop_toBottomOf="@+id/sendChat"
         app:layout_constraintVertical_bias="1.0" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
