@@ -11,6 +11,7 @@
         android:theme="@style/AppTheme">
         <activity android:name=".MessageActivity"></activity>
         <activity android:name=".SOSActivity" />
+        <activity android:name=".SmartbandActivity"/>
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -21,12 +22,11 @@
         <activity
             android:name=".DisplayMessageActivity"
             android:parentActivityName=".MainActivity">
-
             <!-- The meta-data tag is required if you support API level 15 and lower -->
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
         </activity>
     </application>
-
+    <uses-permission android:name="android.permission.BODY_SENSORS"/>
 </manifest>

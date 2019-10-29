@@ -8,7 +8,7 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:1035202121141:android:7589d5a175cea2d3741dfc",
+        "mobilesdk_app_id": "1:1035202121141:android:9484e770059ce6e6741dfc",
         "android_client_info": {
           "package_name": "com.example.mobilesupervisor_supervisorapp"
         }
@@ -51,6 +51,14 @@
         }
       },
       "oauth_client": [
+        {
+          "client_id": "1035202121141-u75j56ukcvko491l5ajfk9f3g54vguc7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.mobilnynadzorca",
+            "certificate_hash": "c150621f467fa6b169f52511e583fa99edc0f723"
+          }
+        },
         {
           "client_id": "1035202121141-il1t267ul1n18i3ltrh9t3npsdjteula.apps.googleusercontent.com",
           "client_type": 1,
