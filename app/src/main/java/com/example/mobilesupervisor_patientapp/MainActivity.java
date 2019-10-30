@@ -60,6 +60,7 @@ import java.util.HashMap;
 public class MainActivity extends AppCompatActivity {
 
 
+    private static final String TAG = "MainActivity";
     SignInButton mGoogleLoginBtn;
     TextView mTextViewSignIn;
     private FirebaseAuth mAuth;
@@ -112,6 +113,7 @@ public class MainActivity extends AppCompatActivity {
                 GoogleSignInAccount account = task.getResult(ApiException.class);
                 firebaseAuthWithGoogle(account);
             } catch (ApiException e) {
+                Log.d(TAG, "ONIEEEEE");
                 // Google Sign In failed, update UI appropriately
                 // ...
             }
