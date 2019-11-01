@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background = "#EFE6D0"
+    android:background = "@color/colorEcru"
     tools:context=".MessageActivity">
 
     <!-- Recycler View -->

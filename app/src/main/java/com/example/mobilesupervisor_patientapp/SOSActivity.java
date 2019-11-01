@@ -16,6 +16,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.Toast;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -44,8 +46,8 @@ import java.util.concurrent.TimeUnit;
 public class SOSActivity extends FragmentActivity {
 
     private static final String TAG = "SOSActivity";
-    Button sendChat;
-    Button SmartbandResult;
+    Button sendChat, SmartbandResult, sendPreparedMessage;
+    ImageButton sosBtn;
     GoogleSignInAccount account;
 
     public static final String EXTRA_MESSAGE = "ja";
@@ -57,7 +59,9 @@ public class SOSActivity extends FragmentActivity {
         setContentView(R.layout.activity_sos);
 
         sendChat = findViewById(R.id.sendChat);
-        SmartbandResult = findViewById(R.id.SmartbandResult);
+        SmartbandResult = findViewById(R.id.checkResults);
+        sendPreparedMessage = findViewById(R.id.sendPreparedMessage);
+        sosBtn = findViewById(R.id.sosBtn);
 
         ActivityCompat.requestPermissions(this,
                 new String[]{Manifest.permission.BODY_SENSORS},
@@ -94,15 +98,34 @@ public class SOSActivity extends FragmentActivity {
                 startActivity(a);
             }
         });
+
         SmartbandResult.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent a = new Intent(SOSActivity.this,SmartbandActivity.class);
-                startActivity(a);
+                Intent b = new Intent(SOSActivity.this,SmartbandActivity.class);
+                startActivity(b);
+            }
+        });
+
+        sendPreparedMessage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent c = new Intent(SOSActivity.this,PreparedMessageActivity.class);
+                startActivity(c);
             }
         });
 
         Intent intent = getIntent();
+
+
+
+        sosBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(SOSActivity.this, "Wiadomość została wysłana", Toast.LENGTH_SHORT).show();}
+
+        });
+
     }
     public void ShowResults(View view){
         //Intent intent = new Intent(this, DisplayMessageActivity.class);
