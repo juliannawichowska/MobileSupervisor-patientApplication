@@ -40,15 +40,23 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class SOSActivity extends FragmentActivity {
 
     private static final String TAG = "SOSActivity";
-    Button sendChat, SmartbandResult, sendPreparedMessage;
+    Button sendChat, SmartbandResult, sendPreparedMessage, videoChat;
     ImageButton sosBtn;
     GoogleSignInAccount account;
+
+    //firebase auth
+    FirebaseAuth firebaseAuth;
+
+    //uid of the users
+    String hisUid = "tS1fyOTPLaPxjj8OfofcnfOKQk82";
+    String myUid = "pXXgJXa0dwbGxdr5XOAyzvAxlJf1";
 
     public static final String EXTRA_MESSAGE = "ja";
     final int GOOGLE_FIT_PERMISSIONS_REQUEST_CODE = System.identityHashCode(this) & 0xFFFF;
@@ -61,6 +69,8 @@ public class SOSActivity extends FragmentActivity {
         sendChat = findViewById(R.id.sendChat);
         SmartbandResult = findViewById(R.id.checkResults);
         sendPreparedMessage = findViewById(R.id.sendPreparedMessage);
+        sosBtn = findViewById(R.id.sosBtn);
+        videoChat = findViewById(R.id.videoChat);
         sosBtn = findViewById(R.id.sosBtn);
 
         ActivityCompat.requestPermissions(this,
@@ -86,10 +96,17 @@ public class SOSActivity extends FragmentActivity {
             accessGoogleFit();
         }
 
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference myRef = database.getReference("message");
 
-        myRef.setValue("Hello, World!");
+
+        //firebase auth instance
+        firebaseAuth = FirebaseAuth.getInstance();
+
+        sosBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                sendMessage("SOS - wezwanie o pomoc");
+            }
+        });
 
         sendChat.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -115,16 +132,16 @@ public class SOSActivity extends FragmentActivity {
             }
         });
 
-        Intent intent = getIntent();
-
-
-
-        sosBtn.setOnClickListener(new View.OnClickListener() {
+        videoChat.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(SOSActivity.this, "Wiadomość została wysłana", Toast.LENGTH_SHORT).show();}
-
+                Intent c = new Intent(SOSActivity.this,PreparedMessageActivity.class);
+                startActivity(c);
+            }
         });
+
+        Intent intent = getIntent();
+        
 
     }
     public void ShowResults(View view){
@@ -181,6 +198,26 @@ public class SOSActivity extends FragmentActivity {
                         }
                 );
     }
+
+
+    private void sendMessage (String message) {
+
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
+
+        String timestamp = String.valueOf(System.currentTimeMillis());
+
+        HashMap<String, Object> hashMap = new HashMap<>();
+        hashMap.put("sender", myUid);
+        hashMap.put("receiver", hisUid);
+        hashMap.put("message", message);
+        hashMap.put("timestamp", timestamp);
+        hashMap.put("isSeen", false);
+
+        reference.child("Messages").push().setValue(hashMap);
+        Toast.makeText(SOSActivity.this, "Wiadomość SOS została wysłana", Toast.LENGTH_SHORT).show();
+
+    }
+
 
 }
 

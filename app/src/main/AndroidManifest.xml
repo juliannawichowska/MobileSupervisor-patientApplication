@@ -11,7 +11,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".PreparedMessageActivity"></activity>
+        <activity android:name=".VideoChatActivity"></activity>
+        <activity android:name=".PreparedMessageActivity" />
         <activity android:name=".MessageActivity" />
         <activity android:name=".SOSActivity" />
         <activity android:name=".SmartbandActivity" />
