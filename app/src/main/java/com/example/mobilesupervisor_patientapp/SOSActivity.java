@@ -5,11 +5,16 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 
 import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.telephony.SmsManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -58,6 +63,10 @@ public class SOSActivity extends FragmentActivity {
     String hisUid = "tS1fyOTPLaPxjj8OfofcnfOKQk82";
     String myUid = "pXXgJXa0dwbGxdr5XOAyzvAxlJf1";
 
+    int i = 0;
+    private static final int REQUEST_CALL = 1;
+    String number = "737641092";
+
     public static final String EXTRA_MESSAGE = "ja";
     final int GOOGLE_FIT_PERMISSIONS_REQUEST_CODE = System.identityHashCode(this) & 0xFFFF;
     final int BODY_SENSORS_PERMISSIONS_REQUEST_CODE = System.identityHashCode(this) & 0xFFFF;
@@ -104,7 +113,27 @@ public class SOSActivity extends FragmentActivity {
         sosBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                sendMessage("SOS - wezwanie o pomoc");
+
+                i ++;
+
+                Handler handler  = new Handler();
+                handler.postDelayed(new Runnable(){
+                    @Override
+                    public void run() {
+                        if (i == 1){
+
+                            SmsManager mySmsManager = SmsManager.getDefault();
+                            mySmsManager.sendTextMessage(number, null, "SOS - wezwanie o pomoc", null, null);
+
+                            sendMessage("SOS - wezwanie o pomoc");
+                        } else if (i == 2){
+
+                            makePhoneCall();
+
+                        }
+                        i = 0;
+                    }
+                }, 500);
             }
         });
 
@@ -135,8 +164,9 @@ public class SOSActivity extends FragmentActivity {
         videoChat.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent c = new Intent(SOSActivity.this,PreparedMessageActivity.class);
-                startActivity(c);
+                Uri uri = Uri.parse("https://www.messenger.com/t"); // missing 'http://' will cause crashed
+                Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+                startActivity(intent);
             }
         });
 
@@ -144,6 +174,29 @@ public class SOSActivity extends FragmentActivity {
         
 
     }
+
+    private void makePhoneCall() {
+        if (ContextCompat.checkSelfPermission(SOSActivity.this,
+                Manifest.permission.CALL_PHONE)  != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(SOSActivity.this,
+                    new String[] {Manifest.permission.CALL_PHONE}, REQUEST_CALL);
+        } else {
+            String dial = "tel:"+ number;
+            startActivity(new Intent(Intent.ACTION_CALL, Uri.parse(dial)));
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == REQUEST_CALL) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                makePhoneCall();
+            } else {
+                Toast.makeText(this, "Permission denied", Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+
     public void ShowResults(View view){
         //Intent intent = new Intent(this, DisplayMessageActivity.class);
         //startActivity(intent);

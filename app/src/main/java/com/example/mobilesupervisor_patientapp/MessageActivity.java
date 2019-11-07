@@ -49,12 +49,6 @@ public class MessageActivity extends AppCompatActivity {
     String hisUid = "tS1fyOTPLaPxjj8OfofcnfOKQk82";
     String myUid = "pXXgJXa0dwbGxdr5XOAyzvAxlJf1";
 
-
-
-    //check if user has seen message
-    ValueEventListener seenListener;
-    DatabaseReference userRefForSeen;
-
     List<ModelChat> chatList;
     AdapterChat adapterChat;
 
@@ -99,58 +93,9 @@ public class MessageActivity extends AppCompatActivity {
 
         readMessages();
 
-        seenMessage();
-
     }
 
-    private void checkUserStatus(){
-        //get current user
-        FirebaseUser user = firebaseAuth.getCurrentUser();
-        if (user != null) {
 
-        } else {
-            startActivity(new Intent(this, MainActivity.class));
-            finish();
-        }
-    }
-
-    @Override
-    protected void onStart() {
-        checkUserStatus();
-        super.onStart();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        userRefForSeen.removeEventListener(seenListener);
-    }
-
-    private void seenMessage() {
-
-        userRefForSeen = FirebaseDatabase.getInstance().getReference("Messages");
-        seenListener = userRefForSeen.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-
-                for (DataSnapshot ds: dataSnapshot.getChildren()){
-                    ModelChat chat = ds.getValue(ModelChat.class);
-                    if(chat.getReceiver().equals(myUid) && chat.getSender().equals(hisUid)) {
-                        HashMap<String, Object> hasSeenHashMap = new HashMap<>();
-                        hasSeenHashMap.put("isSeen", true);
-                        ds.getRef().updateChildren(hasSeenHashMap);
-                    }
-                }
-
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-
-    }
 
     private void readMessages() {
 
