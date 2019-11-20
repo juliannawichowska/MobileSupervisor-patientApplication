@@ -39,7 +39,7 @@
             android:layout_height="wrap_content"
 
             android:layout_weight="1"
-            android:hint="Start typing"
+            android:hint="@string/start_typing"
             android:padding="15dp"/>
 
 

@@ -15,7 +15,7 @@
             android:id="@+id/messageDate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="12/12/2019 09:12AM"
+            android:text="@string/date"
             android:textColor="@color/colorBlack"
             android:textSize="12sp"/>
 
@@ -27,18 +27,10 @@
             android:textColor="@color/colorBlack"
             android:background="@drawable/bg_sender"
             android:padding="15dp"
-            android:text="My Message"
+            android:text="@string/sender_message"
             android:textSize="16sp"/>
 
 
     </LinearLayout>
-
-    <TextView
-        android:id="@+id/isSeenTx"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="end"
-        android:textAlignment="textEnd"
-        android:text="elo"/>
 
 </LinearLayout>

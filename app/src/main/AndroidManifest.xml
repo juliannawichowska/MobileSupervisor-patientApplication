@@ -3,8 +3,10 @@
     package="com.example.mobilesupervisor_patientapp">
 
     <uses-permission android:name="android.permission.BODY_SENSORS" />
-
     <uses-permission android:name="android.permission.CALL_PHONE" />
+    <uses-permission android:name="android.permission.SEND_SMS" />
+
+
 
     <application
         android:allowBackup="true"
@@ -13,7 +15,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".VideoChatActivity"></activity>
+        <activity
+            android:name=".SettingsActivity"
+            android:label="@string/title_activity_settings"></activity>
         <activity android:name=".PreparedMessageActivity" />
         <activity android:name=".MessageActivity" />
         <activity android:name=".SOSActivity" />

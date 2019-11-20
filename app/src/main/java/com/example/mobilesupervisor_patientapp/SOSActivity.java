@@ -3,13 +3,17 @@ package com.example.mobilesupervisor_patientapp;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.fragment.app.FragmentActivity;
+import androidx.preference.PreferenceManager;
 
 import android.Manifest;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
@@ -20,7 +24,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
@@ -30,11 +33,9 @@ import com.google.android.gms.fitness.Fitness;
 import com.google.android.gms.fitness.FitnessOptions;
 import com.google.android.gms.fitness.data.DataPoint;
 import com.google.android.gms.fitness.data.DataSet;
-import com.google.android.gms.fitness.data.DataSource;
 import com.google.android.gms.fitness.data.DataType;
 import com.google.android.gms.fitness.data.Field;
 import com.google.android.gms.fitness.data.Value;
-import com.google.android.gms.fitness.request.DataSourcesRequest;
 import com.google.android.gms.fitness.request.OnDataPointListener;
 import com.google.android.gms.fitness.request.SensorRequest;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -42,45 +43,50 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-public class SOSActivity extends FragmentActivity {
+public class SOSActivity extends  AppCompatActivity {
 
+
+    private Context context;
     private static final String TAG = "SOSActivity";
-    Button sendChat, SmartbandResult, sendPreparedMessage, videoChat;
-    ImageButton sosBtn;
+    Button sendChat, SmartbandResult, sendPreparedMessage, openMessenger, sosBtn;
     GoogleSignInAccount account;
+    String myUid;
+    MainActivity mainActivity = new MainActivity();
+
+    ActionBar actionBar;
 
     //firebase auth
     FirebaseAuth firebaseAuth;
 
-    //uid of the users
-    String hisUid = "tS1fyOTPLaPxjj8OfofcnfOKQk82";
-    String myUid = "pXXgJXa0dwbGxdr5XOAyzvAxlJf1";
-
     int i = 0;
     private static final int REQUEST_CALL = 1;
-    String number = "737641092";
+    private static final int REQUEST_SMS = 1;
 
-    public static final String EXTRA_MESSAGE = "ja";
     final int GOOGLE_FIT_PERMISSIONS_REQUEST_CODE = System.identityHashCode(this) & 0xFFFF;
     final int BODY_SENSORS_PERMISSIONS_REQUEST_CODE = System.identityHashCode(this) & 0xFFFF;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sos);
+        context = this;
 
         sendChat = findViewById(R.id.sendChat);
         SmartbandResult = findViewById(R.id.checkResults);
         sendPreparedMessage = findViewById(R.id.sendPreparedMessage);
         sosBtn = findViewById(R.id.sosBtn);
-        videoChat = findViewById(R.id.videoChat);
+        openMessenger = findViewById(R.id.openMessenger);
         sosBtn = findViewById(R.id.sosBtn);
+
+        //ActionBar and its title
+        actionBar = getSupportActionBar();
+        actionBar.setTitle("Mobile supervisor");
 
         ActivityCompat.requestPermissions(this,
                 new String[]{Manifest.permission.BODY_SENSORS},
@@ -106,7 +112,6 @@ public class SOSActivity extends FragmentActivity {
         }
 
 
-
         //firebase auth instance
         firebaseAuth = FirebaseAuth.getInstance();
 
@@ -115,21 +120,18 @@ public class SOSActivity extends FragmentActivity {
             public void onClick(View view) {
 
                 i ++;
-
                 Handler handler  = new Handler();
                 handler.postDelayed(new Runnable(){
                     @Override
                     public void run() {
                         if (i == 1){
 
-                            SmsManager mySmsManager = SmsManager.getDefault();
-                            mySmsManager.sendTextMessage(number, null, "SOS - wezwanie o pomoc", null, null);
-
+                            sendSMS();
                             sendMessage("SOS - wezwanie o pomoc");
+
                         } else if (i == 2){
 
                             makePhoneCall();
-
                         }
                         i = 0;
                     }
@@ -161,7 +163,7 @@ public class SOSActivity extends FragmentActivity {
             }
         });
 
-        videoChat.setOnClickListener(new View.OnClickListener() {
+        openMessenger.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Uri uri = Uri.parse("https://www.messenger.com/t"); // missing 'http://' will cause crashed
@@ -170,19 +172,67 @@ public class SOSActivity extends FragmentActivity {
             }
         });
 
-        Intent intent = getIntent();
-        
+
+        SharedPreferences wmbPreference = PreferenceManager.getDefaultSharedPreferences(this);
+        boolean isFirstRun = wmbPreference.getBoolean("FIRSTRUN", true);
+        if (isFirstRun)
+        {
+            // Code to run once
+
+            new AlertDialog.Builder(context)
+                    .setTitle("Ustawienie numeru kontaktowego")
+                    .setMessage("W celu wysyłania na telefon nadzorcy alertu, zdefiniuj numery kontaktowe w zakładce 'ustawienia'")
+
+                    // Specifying a listener allows you to take an action before dismissing the dialog.
+                    // The dialog is automatically dismissed when a dialog button is clicked.
+                    .setPositiveButton("Ustawienia", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            Intent c = new Intent(SOSActivity.this,SettingsActivity.class);
+                            startActivity(c);
+                        }
+                    })
+
+                    // A null listener allows the button to dismiss the dialog and take no further action.
+                    .setNegativeButton(android.R.string.no, null)
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .show();
+
+
+
+            SharedPreferences.Editor editor = wmbPreference.edit();
+            editor.putBoolean("FIRSTRUN", false);
+            editor.commit();
+        }
+
 
     }
 
+
+
+
     private void makePhoneCall() {
+        String callphoneNumber = DefaultSettings.getUserCallNumber(context);
         if (ContextCompat.checkSelfPermission(SOSActivity.this,
                 Manifest.permission.CALL_PHONE)  != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(SOSActivity.this,
                     new String[] {Manifest.permission.CALL_PHONE}, REQUEST_CALL);
         } else {
-            String dial = "tel:"+ number;
+            String dial = "tel:"+ callphoneNumber;
             startActivity(new Intent(Intent.ACTION_CALL, Uri.parse(dial)));
+        }
+    }
+
+    private void sendSMS() {
+        String smsphoneNumber = DefaultSettings.getUserSMSNumber(context);
+        if (ContextCompat.checkSelfPermission(SOSActivity.this,
+                Manifest.permission.SEND_SMS)  != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(SOSActivity.this,
+                    new String[] {Manifest.permission.SEND_SMS}, REQUEST_SMS);
+        } else {
+
+            SmsManager mySmsManager = SmsManager.getDefault();
+            mySmsManager.sendTextMessage(smsphoneNumber, null, "SOS - wezwanie o pomoc", null, null);
+            Toast.makeText(this, "Wiadmość SOS została wysłana", Toast.LENGTH_LONG).show();
         }
     }
 
@@ -194,8 +244,16 @@ public class SOSActivity extends FragmentActivity {
             } else {
                 Toast.makeText(this, "Permission denied", Toast.LENGTH_LONG).show();
             }
-        }
+        if (requestCode == REQUEST_SMS) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                sendSMS();
+            } else {
+                Toast.makeText(this, "Permission denied", Toast.LENGTH_LONG).show();
+            }
+         }
+       }
     }
+
 
     public void ShowResults(View view){
         //Intent intent = new Intent(this, DisplayMessageActivity.class);
@@ -252,8 +310,10 @@ public class SOSActivity extends FragmentActivity {
                 );
     }
 
-
     private void sendMessage (String message) {
+
+        FirebaseUser user = firebaseAuth.getCurrentUser();
+        myUid = user.getUid();
 
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
 
@@ -261,17 +321,37 @@ public class SOSActivity extends FragmentActivity {
 
         HashMap<String, Object> hashMap = new HashMap<>();
         hashMap.put("sender", myUid);
-        hashMap.put("receiver", hisUid);
         hashMap.put("message", message);
         hashMap.put("timestamp", timestamp);
-        hashMap.put("isSeen", false);
+        hashMap.put("userType", mainActivity.userType);
 
         reference.child("Messages").push().setValue(hashMap);
-        Toast.makeText(SOSActivity.this, "Wiadomość SOS została wysłana", Toast.LENGTH_SHORT).show();
-
+    }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        //inflate menu
+        getMenuInflater().inflate(R.menu.menu_up, menu);
+        return super.onCreateOptionsMenu(menu);
     }
 
-
+    //handle logout click
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        int id = item.getItemId();
+        if (id==R.id.action_logout){
+            FirebaseAuth.getInstance().signOut();
+            FirebaseUser user = firebaseAuth.getCurrentUser();
+            if(user == null) {
+                startActivity(new Intent(SOSActivity.this, MainActivity.class));
+            }
+        }
+        else if (id==R.id.action_settings){
+            Intent c = new Intent(SOSActivity.this,SettingsActivity.class);
+            startActivity(c);
+        }
+        return super.onOptionsItemSelected(item);
+    }
 }
+
 
 
