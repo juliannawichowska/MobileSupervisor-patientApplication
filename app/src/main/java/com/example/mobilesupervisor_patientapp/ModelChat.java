@@ -3,18 +3,34 @@ package com.example.mobilesupervisor_patientapp;
 
 public class ModelChat {
 
-    String message, receiver, sender, timestamp;
-    boolean isSeen;
+    String message, receiver, sender, timestamp, userType, messageType;
 
     public ModelChat() {
     }
 
-    public ModelChat(String message, String receiver, String sender, String timestamp, boolean isSeen) {
+    public ModelChat(String message, String receiver, String sender, String timestamp, String userType, String messageType) {
         this.message = message;
         this.receiver = receiver;
         this.sender = sender;
         this.timestamp = timestamp;
-        this.isSeen = isSeen;
+        this.userType = userType;
+        this.messageType = messageType;
+    }
+
+    public String getMessageType() {
+        return messageType;
+    }
+
+    public void setMessageType(String messageType) {
+        this.messageType = messageType;
+    }
+
+    public String getUserType() {
+        return userType;
+    }
+
+    public void setUserType(String userType) {
+        this.userType = userType;
     }
 
     public String getMessage() {
@@ -49,11 +65,4 @@ public class ModelChat {
         this.timestamp = timestamp;
     }
 
-    public Boolean isSeen() {
-        return isSeen;
-    }
-
-    public void setSeen(Boolean seen) {
-        isSeen = seen;
-    }
 }

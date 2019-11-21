@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background = "@color/colorEcru"
+    android:background = "@color/colorGrey"
     tools:context=".MessageActivity">
 
     <!-- Recycler View -->
@@ -26,29 +26,34 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_marginBottom="8dp"
-        android:background="#FFFFF0"
+        android:background="@color/colorAccent"
         android:gravity="center"
         android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent">
 
+        <ImageButton
+            android:id="@+id/sendImage"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            app:srcCompat="@drawable/ic_message_image"
+            />
 
         <EditText
             android:id="@+id/messageEdit"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-
             android:layout_weight="1"
-            android:hint="Start typing"
+            android:hint="@string/start_typing"
             android:padding="15dp"/>
 
 
         <ImageButton
             android:id="@+id/sendButton"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:layout_marginBottom="8dp"
-            app:srcCompat="@drawable/ic_send_message"/>
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="4dp"
+            app:srcCompat="@drawable/ic_send_message" />
 
 
     </LinearLayout>

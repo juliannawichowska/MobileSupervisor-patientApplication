@@ -13,33 +13,40 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.squareup.picasso.Picasso;
 
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-public class AdapterChat extends RecyclerView.Adapter<AdapterChat.MyHolder> {
+public class AdapterChat extends RecyclerView.Adapter<AdapterChat.MyHolder>{
 
-    private static final int MSG_TYPE_LEFT = 0;
-    private static final int MSG_TYPE_RIGHT = 1;
+    private static final int receiverMessage = 0;
+    private static final int senderMessage = 1;
     Context context;
     List<ModelChat> chatList;
 
-    FirebaseUser firebaseUser;
+    MainActivity mainActivity = new MainActivity();
 
+    String myUid;
+
+    //firebase auth
+    FirebaseAuth firebaseAuth;
 
     public AdapterChat(Context context, List<ModelChat> chatList) {
+
         this.context = context;
         this.chatList = chatList;
+
+        //firebase auth instance
+        firebaseAuth = FirebaseAuth.getInstance();
     }
 
     @NonNull
     @Override
     public MyHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
         //inflate layouts
-        if(i==MSG_TYPE_RIGHT){
+        if(i==senderMessage){
             View view = LayoutInflater.from(context).inflate(R.layout.sender_chat, viewGroup, false);
             return new MyHolder(view);
         } else {
@@ -50,82 +57,66 @@ public class AdapterChat extends RecyclerView.Adapter<AdapterChat.MyHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull MyHolder myHolder, int i) {
-//get data
+        //get data
         String message = chatList.get(i).getMessage();
         String timestamp = chatList.get(i).getTimestamp();
+        String messageType = chatList.get(i).getMessageType();
 
         //convert time
         Calendar cal = Calendar.getInstance(Locale.GERMAN);
         cal.setTimeInMillis(Long.parseLong(timestamp));
         String dateTime = DateFormat.format("dd/MM/yyyy hh:mm aa", cal).toString();
 
-        //Date date = Calendar.getInstance().getTime();
-        //SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-        //String dateTime  = dateFormat.format(date);
+        if((messageType.equals("text"))||(messageType.equals("sos message"))|| (messageType.equals("prepared message"))){
+            //text message
+            myHolder.messageContents.setVisibility(View.VISIBLE);
+            myHolder.messageImage.setVisibility(View.GONE);
 
+            myHolder.messageContents.setText(message);
+        } else {
+            myHolder.messageContents.setVisibility(View.GONE);
+            myHolder.messageImage.setVisibility(View.VISIBLE);
+        }
 
         //set data
         myHolder.messageContents.setText(message);
         myHolder.messageDate.setText(dateTime);
 
-
-        //set if the message has been seen or delivered
-        if (i==chatList.size()) {
-            if (chatList.get(i).isSeen()){
-                myHolder.isSeenTx.setText("Seen");
-            } else {
-                myHolder.isSeenTx.setText("Delivered");
-            }
-        }
-        else {
-            myHolder.isSeenTx.setVisibility(View.GONE);
-        }
-
-
+        Picasso.get().load(message).placeholder(R.drawable.ic_message_image).into(myHolder.messageImage);
     }
-
 
     @Override
     public int getItemCount() {
-
         return chatList.size();
     }
 
     @Override
     public int getItemViewType(int position) {
+        FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
+        myUid = firebaseUser.getUid();
         //get currently signed in user
-        firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-        if(chatList.get(position).getSender().equals(firebaseUser.getUid())){
-            return MSG_TYPE_RIGHT;
+        if(chatList.get(position).getUserType().equals(mainActivity.userType)){
+            return senderMessage;
         } else {
-            return MSG_TYPE_LEFT;
+            return receiverMessage;
         }
     }
+
     class MyHolder extends RecyclerView.ViewHolder{
 
         //views
-        ImageView imageAccount;
-        TextView messageContents, messageDate, isSeenTx;
-
+        ImageView imageAccount, messageImage;
+        TextView messageContents, messageDate;
 
         public MyHolder(@NonNull View itemView) {
             super(itemView);
 
             //init views
             imageAccount = itemView.findViewById(R.id.imageAccount);
+            messageImage = itemView.findViewById(R.id.messageImage);
             messageContents = itemView.findViewById(R.id. messageContents);
             messageDate = itemView.findViewById(R.id.messageDate);
-            isSeenTx = itemView.findViewById(R.id.isSeenTx);
-
-
-
 
         }
     }
-
-
-
-
 }
-
-

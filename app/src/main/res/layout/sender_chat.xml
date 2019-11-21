@@ -6,7 +6,7 @@
     android:layout_height="wrap_content"
     android:padding="10dp">
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
@@ -15,7 +15,7 @@
             android:id="@+id/messageDate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="12/12/2019 09:12AM"
+            android:text="@string/date"
             android:textColor="@color/colorBlack"
             android:textSize="12sp"/>
 
@@ -23,22 +23,27 @@
             android:id="@+id/messageContents"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
             android:textColor="@color/colorBlack"
             android:background="@drawable/bg_sender"
             android:padding="15dp"
-            android:text="My Message"
-            android:textSize="16sp"/>
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_toEndOf="@+id/messageDate"
+            android:text="@string/sender_message"
+            android:textSize="20sp"/>
+
+        <ImageView
+            android:id="@+id/messageImage"
+            android:layout_width="200dp"
+            android:layout_height="200dp"
+            android:adjustViewBounds="true"
+            android:padding="15dp"
+            android:scaleType="fitCenter"
+            android:layout_alignParentEnd="true"
+            app:srcCompat="@drawable/ic_message_image"
+            android:background="@drawable/bg_sender"/>
 
 
-    </LinearLayout>
-
-    <TextView
-        android:id="@+id/isSeenTx"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="end"
-        android:textAlignment="textEnd"
-        android:text="elo"/>
+    </RelativeLayout>
 
 </LinearLayout>
