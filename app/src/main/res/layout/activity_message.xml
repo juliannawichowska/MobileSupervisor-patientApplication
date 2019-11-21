@@ -31,6 +31,12 @@
         android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent">
 
+        <ImageButton
+            android:id="@+id/sendImage"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            app:srcCompat="@drawable/ic_message_image"
+            />
 
         <EditText
             android:id="@+id/messageEdit"

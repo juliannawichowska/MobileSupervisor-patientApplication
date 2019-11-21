@@ -25,6 +25,7 @@
     <string name="date">12/12/2019 09:12AM</string>
     <string name="logout">Wyloguj się</string>
     <string name="settings">Ustawienia</string>
+    <string name="camera">Podgląd kamery</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>

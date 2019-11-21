@@ -3,17 +3,26 @@ package com.example.mobilesupervisor_patientapp;
 
 public class ModelChat {
 
-    String message, receiver, sender, timestamp, userType;
+    String message, receiver, sender, timestamp, userType, messageType;
 
     public ModelChat() {
     }
 
-    public ModelChat(String message, String receiver, String sender, String timestamp, String userType) {
+    public ModelChat(String message, String receiver, String sender, String timestamp, String userType, String messageType) {
         this.message = message;
         this.receiver = receiver;
         this.sender = sender;
         this.timestamp = timestamp;
         this.userType = userType;
+        this.messageType = messageType;
+    }
+
+    public String getMessageType() {
+        return messageType;
+    }
+
+    public void setMessageType(String messageType) {
+        this.messageType = messageType;
     }
 
     public String getUserType() {

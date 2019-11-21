@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.squareup.picasso.Picasso;
 
 import java.util.Calendar;
 import java.util.List;
@@ -59,16 +60,29 @@ public class AdapterChat extends RecyclerView.Adapter<AdapterChat.MyHolder>{
         //get data
         String message = chatList.get(i).getMessage();
         String timestamp = chatList.get(i).getTimestamp();
+        String messageType = chatList.get(i).getMessageType();
 
         //convert time
         Calendar cal = Calendar.getInstance(Locale.GERMAN);
         cal.setTimeInMillis(Long.parseLong(timestamp));
         String dateTime = DateFormat.format("dd/MM/yyyy hh:mm aa", cal).toString();
 
+        if((messageType.equals("text"))||(messageType.equals("sos message"))|| (messageType.equals("prepared message"))){
+            //text message
+            myHolder.messageContents.setVisibility(View.VISIBLE);
+            myHolder.messageImage.setVisibility(View.GONE);
+
+            myHolder.messageContents.setText(message);
+        } else {
+            myHolder.messageContents.setVisibility(View.GONE);
+            myHolder.messageImage.setVisibility(View.VISIBLE);
+        }
+
         //set data
         myHolder.messageContents.setText(message);
         myHolder.messageDate.setText(dateTime);
 
+        Picasso.get().load(message).placeholder(R.drawable.ic_message_image).into(myHolder.messageImage);
     }
 
     @Override
@@ -91,7 +105,7 @@ public class AdapterChat extends RecyclerView.Adapter<AdapterChat.MyHolder>{
     class MyHolder extends RecyclerView.ViewHolder{
 
         //views
-        ImageView imageAccount;
+        ImageView imageAccount, messageImage;
         TextView messageContents, messageDate;
 
         public MyHolder(@NonNull View itemView) {
@@ -99,6 +113,7 @@ public class AdapterChat extends RecyclerView.Adapter<AdapterChat.MyHolder>{
 
             //init views
             imageAccount = itemView.findViewById(R.id.imageAccount);
+            messageImage = itemView.findViewById(R.id.messageImage);
             messageContents = itemView.findViewById(R.id. messageContents);
             messageDate = itemView.findViewById(R.id.messageDate);
 

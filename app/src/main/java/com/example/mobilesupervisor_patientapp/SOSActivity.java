@@ -324,6 +324,7 @@ public class SOSActivity extends  AppCompatActivity {
         hashMap.put("message", message);
         hashMap.put("timestamp", timestamp);
         hashMap.put("userType", mainActivity.userType);
+        hashMap.put("messageType", "sos message");
 
         reference.child("Messages").push().setValue(hashMap);
     }
@@ -348,6 +349,9 @@ public class SOSActivity extends  AppCompatActivity {
         else if (id==R.id.action_settings){
             Intent c = new Intent(SOSActivity.this,SettingsActivity.class);
             startActivity(c);
+        }
+        else if (id==R.id.action_camera){
+            //obraz z kamery
         }
         return super.onOptionsItemSelected(item);
     }

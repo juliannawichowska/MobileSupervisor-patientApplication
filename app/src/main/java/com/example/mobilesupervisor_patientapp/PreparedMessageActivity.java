@@ -129,6 +129,7 @@ public class PreparedMessageActivity extends AppCompatActivity {
         hashMap.put("message", message);
         hashMap.put("timestamp", timestamp);
         hashMap.put("userType", mainActivity.userType);
+        hashMap.put("messageType", "prepared message");
 
         reference.child("Messages").push().setValue(hashMap);
         Toast.makeText(PreparedMessageActivity.this, "Wiadomość została wysłana", Toast.LENGTH_SHORT).show();
