@@ -15,7 +15,7 @@
                     android:bottom="1px"
                     android:left="1px"
                     android:right="1px" />
-                <solid android:color="#01000000" />
+                <solid android:color="@color/colorWhite" />
             </shape>
         </rotate>
     </item>
@@ -25,7 +25,7 @@
                 android:bottom="1px"
                 android:left="1px"
                 android:right="1px" />
-            <solid android:color="#01000000" />
+            <solid android:color="@color/colorWhite" />
             <corners android:radius="8dp" />
         </shape>
     </item>
@@ -40,14 +40,14 @@
             <shape android:shape="rectangle">
                 <corners android:radius="4dp" />
                 <padding android:bottom="1px" />
-                <solid android:color="#09000000" />
+                <solid android:color="@color/colorWhite" />
             </shape>
         </rotate>
     </item>
     <item android:left="8dp">
         <shape android:shape="rectangle">
             <padding android:bottom="1px" />
-            <solid android:color="#09000000" />
+            <solid android:color="@color/colorWhite" />
             <corners android:radius="8dp" />
         </shape>
     </item>
@@ -66,7 +66,7 @@
                     android:bottom="1px"
                     android:left="1px"
                     android:right="1px" />
-                <solid android:color="#10000000" />
+                <solid android:color="@color/colorWhite" />
             </shape>
         </rotate>
     </item>
@@ -76,7 +76,7 @@
                 android:bottom="1px"
                 android:left="1px"
                 android:right="1px" />
-            <solid android:color="#10000000" />
+            <solid android:color="@color/colorWhite" />
             <corners android:radius="8dp" />
         </shape>
     </item>
