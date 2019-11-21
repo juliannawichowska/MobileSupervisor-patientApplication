@@ -5,7 +5,71 @@
 
     <TextView
         android:id="@+id/textView2"
-        android:layout_width="114dp"
-        android:layout_height="35dp"
-        android:text="TextView" />
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Ilosc krokow dzis wykonanych"
+        android:layout_marginLeft="30dp"
+        android:layout_marginTop="30dp"
+        android:layout_marginRight="30dp"
+        android:textSize="25sp"
+        android:textAlignment="center"/>
+
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:fontFamily="Arial"
+        android:textAlignment="center"
+        android:text="kroki"
+        android:textSize="50sp"
+        android:textColor="@color/DarkGray"/>
+
+    <TextView
+        android:id="@+id/textView4"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Rezultat spaceru"
+        android:layout_marginTop="20sp"
+        android:textSize="20sp"
+        android:textAlignment="center"/>
+
+    <TextView
+        android:id="@+id/textView5"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Smartband"
+        android:layout_marginTop="20sp"
+        android:textSize="25sp"
+        android:textAlignment="center"/>
+
+    <CheckBox
+        android:id="@+id/checkBox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Ostatnie 30 minut" />
+
+    <CheckBox
+        android:id="@+id/checkBox2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Ostatnia godzina" />
+
+    <CheckBox
+        android:id="@+id/checkBox3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Ostatni dzień" />
+
+    <CheckBox
+        android:id="@+id/checkBox4"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Ostatni tydzień" />
+
+    <CheckBox
+        android:id="@+id/checkBox5"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Ostatni miesiąc" />
 </LinearLayout>

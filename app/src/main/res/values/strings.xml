@@ -102,4 +102,12 @@
     <string name="sendPreparedMessage">Wyślij gotową wiadomość</string>
     <string name="sendChat">Wyślij wiadomość tekstową</string>
     <string name="checkResults">Sprawdź wyniki</string>
+    <string name="ble_not_supported">Ble not supported</string>
+    <string name="error_bluetooth_not_supported">Ble not supported</string>
+    <string name="error_bluetooth_not_enabled">Ble not enabled</string>
+    <string name="connected">connected</string>
+    <string name="disconncected">disconnected</string>
+    <string name="no_data">no data</string>
+    <string name="menu_scan">scan</string>
+    <string name="menu_stop">stop</string>
 </resources>
