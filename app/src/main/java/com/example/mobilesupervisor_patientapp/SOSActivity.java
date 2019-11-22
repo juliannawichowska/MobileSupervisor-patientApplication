@@ -1,32 +1,44 @@
 package com.example.mobilesupervisor_patientapp;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.preference.PreferenceManager;
-
 import android.Manifest;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothGatt;
+import android.bluetooth.BluetoothGattCallback;
+import android.bluetooth.BluetoothGattCharacteristic;
+import android.bluetooth.BluetoothGattDescriptor;
+import android.bluetooth.BluetoothManager;
+import android.bluetooth.le.BluetoothLeScanner;
+import android.bluetooth.le.ScanCallback;
+import android.bluetooth.le.ScanResult;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.preference.PreferenceManager;
+import android.os.ParcelUuid;
 import android.telephony.SmsManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.preference.PreferenceManager;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -49,17 +61,34 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 public class SOSActivity extends  AppCompatActivity {
 
+    BluetoothManager btManager;
+    BluetoothAdapter btAdapter;
+    BluetoothDevice mBluetoothDevice;
+    public BluetoothGatt mBluetoothGatt;
+    private static final int STATE_DISCONNECTED = 0;
+    private static final int STATE_CONNECTED = 2;
+    public static List<ParcelUuid> MY_UUID;
+    UUID CLIENT_CHARACTERISTIC_CONFIG_UUID, HEART_RATE_SERVICE_UUID, HEART_RATE_MEASUREMENT_CHAR_UUID, HEART_RATE_CONTROL_POINT_CHAR_UUID;
 
+    private final static int REQUEST_ENABLE_BT = 1;
+    private static final int PERMISSION_REQUEST_COARSE_LOCATION = 1;
+    public static Map<ParcelUuid, byte[]> mDeviceData;
+    private BluetoothLeScanner btScanner;
     private Context context;
+    public static long total;
     private static final String TAG = "SOSActivity";
     Button sendChat, SmartbandResult, sendPreparedMessage, openMessenger, sosBtn;
     GoogleSignInAccount account;
     String myUid;
     MainActivity mainActivity = new MainActivity();
+    String mDeviceAddress = "F9:3C:B6:95:A4:1C";
 
     ActionBar actionBar;
 
@@ -72,10 +101,15 @@ public class SOSActivity extends  AppCompatActivity {
 
     final int GOOGLE_FIT_PERMISSIONS_REQUEST_CODE = System.identityHashCode(this) & 0xFFFF;
     final int BODY_SENSORS_PERMISSIONS_REQUEST_CODE = System.identityHashCode(this) & 0xFFFF;
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sos);
+        HEART_RATE_SERVICE_UUID = convertFromInteger(0x180D);
+        HEART_RATE_MEASUREMENT_CHAR_UUID = convertFromInteger(0x2A37);
+        HEART_RATE_CONTROL_POINT_CHAR_UUID = convertFromInteger(0x2A39);
+        CLIENT_CHARACTERISTIC_CONFIG_UUID = convertFromInteger(0x2902);
         context = this;
 
         sendChat = findViewById(R.id.sendChat);
@@ -88,6 +122,31 @@ public class SOSActivity extends  AppCompatActivity {
         //ActionBar and its title
         actionBar = getSupportActionBar();
         actionBar.setTitle("Mobile supervisor");
+
+        btManager = (BluetoothManager)getSystemService(Context.BLUETOOTH_SERVICE);
+        btAdapter = btManager.getAdapter();
+        btScanner = btAdapter.getBluetoothLeScanner();
+
+        if (btAdapter != null && !btAdapter.isEnabled()) {
+            Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            startActivityForResult(enableIntent,REQUEST_ENABLE_BT);
+        }
+
+
+        // Make sure we have access coarse location enabled, if not, prompt the user to enable it
+        if (this.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("This app needs location access");
+            builder.setMessage("Please grant location access so this app can detect peripherals.");
+            builder.setPositiveButton(android.R.string.ok, null);
+            builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                @Override
+                public void onDismiss(DialogInterface dialog) {
+                    requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, PERMISSION_REQUEST_COARSE_LOCATION);
+                }
+            });
+            builder.show();
+        }
 
         ActivityCompat.requestPermissions(this,
                 new String[]{Manifest.permission.BODY_SENSORS},
@@ -205,10 +264,15 @@ public class SOSActivity extends  AppCompatActivity {
             editor.commit();
         }
 
-
+        startScanning();
     }
 
-
+    public UUID convertFromInteger(int i) {
+        final long MSB = 0x0000000000001000L;
+        final long LSB = 0x800000805f9b34fbL;
+        long value = i & 0xFFFFFFFF;
+        return new UUID(MSB | (value << 32), LSB);
+    }
 
 
     private void makePhoneCall() {
@@ -267,7 +331,7 @@ public class SOSActivity extends  AppCompatActivity {
                     @Override
                     public void onSuccess(DataSet dataSet) {
                         Log.i(TAG, "Successfully subscribed");
-                        long total = dataSet.isEmpty() ? 0 : dataSet.getDataPoints().get(0).getValue(Field.FIELD_STEPS).asInt();
+                        total = dataSet.isEmpty() ? 0 : dataSet.getDataPoints().get(0).getValue(Field.FIELD_STEPS).asInt();
                         Log.i(TAG, "Total steps: " + total);
                     }
                 })
@@ -356,6 +420,96 @@ public class SOSActivity extends  AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+    public void startScanning() {
+        AsyncTask.execute(new Runnable() {
+            @Override
+            public void run() {
+                btScanner.startScan(leScanCallback);
+            }
+        });
+    }
+
+    public void stopScanning() {
+        System.out.println("stopping scanning");
+        AsyncTask.execute(new Runnable() {
+            @Override
+            public void run() {
+                btScanner.stopScan(leScanCallback);
+            }
+        });
+    }
+    public void connect() {
+
+        final BluetoothManager bluetoothManager =
+                (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
+        btAdapter = bluetoothManager.getAdapter();
+
+        final BluetoothDevice device = btAdapter
+                .getRemoteDevice(mDeviceAddress);
+        mBluetoothGatt = device.connectGatt(this, false, mGattCallback);
+    }
+    public void disconnect() {
+        mBluetoothGatt.disconnect();
+    }
+
+
+    private ScanCallback leScanCallback = new ScanCallback() {
+        @Override
+        public void onScanResult(int callbackType, ScanResult result) {
+            processResult(result);
+        }
+
+        private void processResult(ScanResult result){
+            mBluetoothDevice = result.getDevice();
+            mDeviceAddress = result.getDevice().getAddress();
+            mDeviceData = result.getScanRecord().getServiceData();
+            Log.v("test", "ZNALZEZIONO" + mDeviceAddress);
+            if (mDeviceAddress.equals("F9:3C:B6:95:A4:1C")) {
+                Log.v("test", "ZNALZEZIONOooooooooooooooo" + mDeviceAddress);
+                MY_UUID = result.getScanRecord().getServiceUuids();
+                stopScanning();
+                connect();
+            }
+        }
+    };
+    BluetoothGattCallback mGattCallback  = new BluetoothGattCallback() {
+        public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
+            if (newState == STATE_CONNECTED) {
+                gatt.discoverServices();
+            }
+        }
+        public void onServicesDiscovered(BluetoothGatt gatt, int status) {
+            BluetoothGattCharacteristic characteristic =
+                    gatt.getService(HEART_RATE_SERVICE_UUID)
+                            .getCharacteristic(HEART_RATE_MEASUREMENT_CHAR_UUID);
+            gatt.setCharacteristicNotification(characteristic, true);
+            BluetoothGattDescriptor descriptor = characteristic.getDescriptor(CLIENT_CHARACTERISTIC_CONFIG_UUID);
+//            descriptor.setValue(BluetoothGattDescriptor.ENABLE_INDICATION_VALUE);
+            descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
+            gatt.writeDescriptor(descriptor);
+
+        }
+        public void onCharacteristicRead(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
+            super.onCharacteristicRead(gatt, characteristic, status);
+            final Integer batteryLevel = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 0);
+
+            if (batteryLevel != null) {
+                Log.d(TAG, "battery level: " + batteryLevel);
+            }
+        }
+        public void onDescriptorWrite(BluetoothGatt gatt, BluetoothGattDescriptor descriptor, int status) {
+
+            Log.e(TAG, "SWWWWWEEEEEEEEEEEETstatus"+status);
+            BluetoothGattCharacteristic characteristic = gatt.getService(HEART_RATE_SERVICE_UUID).getCharacteristic(HEART_RATE_CONTROL_POINT_CHAR_UUID);
+            characteristic.setValue(new byte[] {1,1});
+            gatt.writeCharacteristic(characteristic);
+        }
+        public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
+            byte[] value = characteristic.getValue();
+            Log.e(TAG, "SWWWWWEEEEEEEEEEEET"+value[0]);
+            Log.e(TAG, "SWWWWWEEEEEEEEEEEET"+value[1]);
+        }
+    };
 }
 
 
