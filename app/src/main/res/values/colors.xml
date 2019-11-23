@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-<<<<<<< HEAD
     <color name="colorPrimary">#008577</color>
     <color name="colorPrimaryDark">#00574B</color>
     <color name="colorAccent">#D81B21</color>
@@ -133,11 +132,6 @@
     <color name="SpringGreen">#00FF7F</color>
     <color name="Lime">#00FF00</color>
     <color name="MediumSpringGreen">#00FA9A</color>
-=======
-    <color name="colorPrimary">#78909c</color>
-    <color name="colorPrimaryDark">#4b636e</color>
-    <color name="colorAccent">#a7c0cd</color>
->>>>>>> origin/master
     <color name="colorWhite">#FFFFFF</color>
     <color name="colorBlack">#000000</color>
     <color name="colorEcru">#E0D2B0</color>

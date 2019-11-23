@@ -24,4 +24,8 @@ public class DefaultSettings {
         getSharedPreferencesInstance(context);
         return sharedPreferences.getString("callNumber", "");
     }
+//    public static String getMACaddress(Context context) {
+//        getSharedPreferencesInstance(context);
+//        return sharedPreferences.getString("bleMAC", "");
+//    }
 }

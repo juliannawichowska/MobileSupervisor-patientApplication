@@ -32,16 +32,10 @@
 
     <PreferenceCategory app:title="@string/bluetooth_header">
 
-        <SwitchPreferenceCompat
-            app:key="sync"
-            app:title="@string/sync_title" />
-
-        <SwitchPreferenceCompat
-            app:dependency="sync"
-            app:key="attachment"
-            app:summaryOff="@string/attachment_summary_off"
-            app:summaryOn="@string/attachment_summary_on"
-            app:title="@string/attachment_title" />
+        <EditTextPreference
+            app:key="bleMAC"
+            app:title="Adres MAC czujnika"
+            app:useSimpleSummaryProvider="true"  />
 
     </PreferenceCategory>
 

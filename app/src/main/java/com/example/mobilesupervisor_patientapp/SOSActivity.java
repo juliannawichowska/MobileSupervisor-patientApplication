@@ -60,6 +60,10 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -72,7 +76,6 @@ public class SOSActivity extends  AppCompatActivity {
     BluetoothAdapter btAdapter;
     BluetoothDevice mBluetoothDevice;
     public BluetoothGatt mBluetoothGatt;
-    private static final int STATE_DISCONNECTED = 0;
     private static final int STATE_CONNECTED = 2;
     public static List<ParcelUuid> MY_UUID;
     UUID CLIENT_CHARACTERISTIC_CONFIG_UUID, HEART_RATE_SERVICE_UUID, HEART_RATE_MEASUREMENT_CHAR_UUID, HEART_RATE_CONTROL_POINT_CHAR_UUID;
@@ -83,6 +86,7 @@ public class SOSActivity extends  AppCompatActivity {
     private BluetoothLeScanner btScanner;
     private Context context;
     public static long total;
+    public static int pulse;
     private static final String TAG = "SOSActivity";
     Button sendChat, SmartbandResult, sendPreparedMessage, openMessenger, sosBtn;
     GoogleSignInAccount account;
@@ -506,10 +510,21 @@ public class SOSActivity extends  AppCompatActivity {
         }
         public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
             byte[] value = characteristic.getValue();
-            Log.e(TAG, "SWWWWWEEEEEEEEEEEET"+value[0]);
             Log.e(TAG, "SWWWWWEEEEEEEEEEEET"+value[1]);
+            pulse = value[1];
+            sendHRtoDB(pulse);
         }
     };
+        public void sendHRtoDB(int pulse) {
+            final DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("Results");
+            Map<String, Object> Steps = new HashMap<>();
+            Date date = Calendar.getInstance().getTime();
+            DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH-mm");
+            String strDate = dateFormat.format(date);
+            Steps.put("Date", strDate);
+            Steps.put("Pulse", pulse);
+            reference.child("Pulse").child(strDate).setValue(pulse);
+        }
 }
 
 
