@@ -28,6 +28,11 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -39,15 +44,20 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class MessageActivity extends AppCompatActivity {
     ActionBar actionBar;
@@ -57,6 +67,14 @@ public class MessageActivity extends AppCompatActivity {
     ImageButton sendButton;
     ImageButton sendImage;
     ImageView messageImage;
+
+    final private String FCM_API = "https://fcm.googleapis.com/fcm/send";
+    final private String serverKey = "key=" + "AAAA8QbazbU:APA91bGn_J2zlX6ulfM_DUFwCuI0Ec93AuOMIYtjOnYlyoejwfJ89Rtp03XoAzMkfQY0GJITvgDtIzv8Lr4Yr8OLFe0A3QqoROeLXq5BCzAuvVoBkIBIfRda87zN9sRGockdm2GCbuE-";
+    final private String contentType = "application/json";
+    final String TAG = "NOTIFICATION TAG";
+
+    String NOTIFICATION_TITLE = "Nowa wiadomość od pacjenta!";
+    String TOPIC;
 
     MainActivity mainActivity = new MainActivity();
     String myUid;
@@ -114,6 +132,7 @@ public class MessageActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Log.v("","wyslane");
+
                 //get text from EditText
                 String message = messageEdit.getText().toString();
                 //check if message is empty
@@ -252,8 +271,8 @@ public class MessageActivity extends AppCompatActivity {
                 }
             }
             break;
-            }
         }
+    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -327,13 +346,29 @@ public class MessageActivity extends AppCompatActivity {
         hashMap.put("messageType", "text");
 
         reference.child("Messages").push().setValue(hashMap);
+
+        TOPIC = "/topics/nadzorca"; //topic must match with what the receiver subscribed to
+
+        JSONObject notification = new JSONObject();
+        JSONObject notificationBody = new JSONObject();
+        try {
+            notificationBody.put("title", NOTIFICATION_TITLE);
+            notificationBody.put("message", message);
+
+            notification.put("to", TOPIC);
+            notification.put("data", notificationBody);
+        } catch (JSONException e) {
+            Log.e(TAG, "onCreate: " + e.getMessage() );
+        }
+        sendNotification(notification);
     }
+
 
     private void sendImageMessage(Uri image_uri) throws IOException {
 
         //Path to place which will contain all send images
         final String timeStamp = ""+System.currentTimeMillis();
-        String fileNameAndPath = "ChatImages/"+"post_"+timeStamp;
+        String fileNameAndPath = "MessageImages/"+"post_"+timeStamp;
 
         Log.v("","gierrrrr");
 
@@ -364,6 +399,22 @@ public class MessageActivity extends AppCompatActivity {
                             hashMap.put("userType", mainActivity.userType);
                             hashMap.put("messageType", "image");
                             databaseReference.child("Messages").push().setValue(hashMap);
+
+
+                            TOPIC = "/topics/nadzorca"; //topic must match with what the receiver subscribed to
+
+                            JSONObject notification = new JSONObject();
+                            JSONObject notificationBody = new JSONObject();
+                            try {
+                                notificationBody.put("title", NOTIFICATION_TITLE);
+                                notificationBody.put("message", "Zobacz zdjęcie");
+
+                                notification.put("to", TOPIC);
+                                notification.put("data", notificationBody);
+                            } catch (JSONException e) {
+                                Log.e(TAG, "onCreate: " + e.getMessage() );
+                            }
+                            sendNotification(notification);
                         }
                     }
                 })
@@ -373,9 +424,32 @@ public class MessageActivity extends AppCompatActivity {
                         //failed
                     }
                 });
-
-
     }
 
-
+    private void sendNotification(JSONObject notification) {
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(FCM_API, notification,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        Log.i(TAG, "onResponse: " + response.toString());
+                        Toast.makeText(MessageActivity.this, "cos tu jest", Toast.LENGTH_LONG).show();
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Toast.makeText(MessageActivity.this, "Request error", Toast.LENGTH_LONG).show();
+                        Log.i(TAG, "onErrorResponse: Didn't work");
+                    }
+                }){
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> params = new HashMap<>();
+                params.put("Authorization", serverKey);
+                params.put("Content-Type", contentType);
+                return params;
+            }
+        };
+        MySingleton.getInstance(getApplicationContext()).addToRequestQueue(jsonObjectRequest);
+    }
 }

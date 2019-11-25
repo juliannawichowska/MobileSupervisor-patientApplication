@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "1035202121141-o53hv6esqmh3566i1fkds1orq3a13c8f.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.mobilesupervisor_supervisorapp",
+            "certificate_hash": "cf7ccdcfdb2e2a621b848ea20a97cc67dc82c7ed"
+          }
+        },
+        {
           "client_id": "1035202121141-csl1do9o4v995r4m5atnr2e0r2nh00mr.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
@@ -51,6 +59,14 @@
         }
       },
       "oauth_client": [
+        {
+          "client_id": "1035202121141-r9flpn7kt950020fkrdvhbdg90rfa1ak.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.mobilnynadzorca",
+            "certificate_hash": "cf7ccdcfdb2e2a621b848ea20a97cc67dc82c7ed"
+          }
+        },
         {
           "client_id": "1035202121141-u75j56ukcvko491l5ajfk9f3g54vguc7.apps.googleusercontent.com",
           "client_type": 1,

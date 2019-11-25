@@ -59,6 +59,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -178,6 +179,17 @@ public class SOSActivity extends  AppCompatActivity {
 
         //firebase auth instance
         firebaseAuth = FirebaseAuth.getInstance();
+
+        FirebaseMessaging.getInstance().subscribeToTopic("pacjent")
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (!task.isSuccessful()) {
+                            Log.v("","success");
+                        }
+                        Log.v("", "failure66");
+                    }
+                });
 
         sosBtn.setOnClickListener(new View.OnClickListener() {
             @Override
