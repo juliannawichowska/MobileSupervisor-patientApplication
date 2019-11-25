@@ -1,7 +1,12 @@
 package com.example.mobilesupervisor_patientapp;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.TextView;
 
 import androidx.fragment.app.FragmentActivity;
@@ -22,6 +27,8 @@ public class SmartbandActivity extends FragmentActivity {
     private static final String TAG = "SMARTBAND";
     private long totalSteps;
     FirebaseUser firebaseUser;
+    Button checkBox, checkBox2, checkBox3, checkBox4, checkBox5;
+    public static int period;
 
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -41,6 +48,52 @@ public class SmartbandActivity extends FragmentActivity {
 
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference myRef = database.getReference("Users");
+        checkBox = findViewById(R.id.checkBox);
+        checkBox2 = findViewById(R.id.checkBox2);
+        checkBox3 = findViewById(R.id.checkBox3);
+        checkBox4 = findViewById(R.id.checkBox4);
+        checkBox5 = findViewById(R.id.checkBox5);
+        checkBox.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                period = 1;
+                Intent a = new Intent(SmartbandActivity.this,HeartRateActivity.class);
+                startActivity(a);
+            }
+        });
+        checkBox2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                period = 2;
+                Intent a = new Intent(SmartbandActivity.this,HeartRateActivity.class);
+                startActivity(a);
+            }
+        });
+        checkBox3.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                period = 3;
+                Intent a = new Intent(SmartbandActivity.this,HeartRateActivity.class);
+                startActivity(a);
+            }
+        });
+        checkBox4.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                period = 4;
+                Intent a = new Intent(SmartbandActivity.this,HeartRateActivity.class);
+                startActivity(a);
+            }
+        });
+        checkBox5.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                period = 5;
+                Intent a = new Intent(SmartbandActivity.this,HeartRateActivity.class);
+                startActivity(a);
+            }
+        });
+
     }
 
     private void makeStepsOutput(long Steps, TextView info) {

@@ -44,6 +44,7 @@
             android:name=".SettingsActivity"
             android:label="@string/title_activity_settings" />
         <activity android:name=".PreparedMessageActivity" />
+        <activity android:name=".HeartRateActivity"/>
         <activity android:name=".MessageActivity" />
         <activity android:name=".SOSActivity" />
         <activity android:name=".SmartbandActivity" />

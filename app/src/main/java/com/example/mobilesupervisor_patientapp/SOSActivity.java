@@ -529,13 +529,13 @@ public class SOSActivity extends  AppCompatActivity {
     };
         public void sendHRtoDB(int pulse) {
             final DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("Results");
-            Map<String, Object> Steps = new HashMap<>();
+            Map<String, Object> Pulse = new HashMap<>();
             Date date = Calendar.getInstance().getTime();
             DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH-mm");
             String strDate = dateFormat.format(date);
-            Steps.put("Date", strDate);
-            Steps.put("Pulse", pulse);
-            reference.child("Pulse").child(strDate).setValue(pulse);
+            Pulse.put("Date", strDate);
+            Pulse.put("Pulse", pulse);
+            reference.child("Heart Rate").child(strDate).setValue(Pulse);
         }
 }
 
