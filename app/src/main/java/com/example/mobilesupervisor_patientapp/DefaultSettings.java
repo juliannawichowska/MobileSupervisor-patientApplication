@@ -24,6 +24,16 @@ public class DefaultSettings {
         getSharedPreferencesInstance(context);
         return sharedPreferences.getString("callNumber", "");
     }
+
+    public static String getMinRange(Context context) {
+        getSharedPreferencesInstance(context);
+        return sharedPreferences.getString("minRange", "");
+    }
+
+    public static String getMaxRange(Context context) {
+        getSharedPreferencesInstance(context);
+        return sharedPreferences.getString("maxRange", "");
+    }
 //    public static String getMACaddress(Context context) {
 //        getSharedPreferencesInstance(context);
 //        return sharedPreferences.getString("bleMAC", "");

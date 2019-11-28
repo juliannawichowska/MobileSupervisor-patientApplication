@@ -30,11 +30,25 @@
 
     </PreferenceCategory>
 
+    <PreferenceCategory app:title="@string/pulse_header">
+
+        <EditTextPreference
+            app:key="minRange"
+            app:title="@string/minRange_title"
+            app:useSimpleSummaryProvider="true" />
+
+        <EditTextPreference
+            app:key="maxRange"
+            app:title="@string/maxRange_title"
+            app:useSimpleSummaryProvider="true" />
+
+    </PreferenceCategory>
+
     <PreferenceCategory app:title="@string/bluetooth_header">
 
         <EditTextPreference
             app:key="bleMAC"
-            app:title="Adres MAC czujnika"
+            app:title="@string/MACAddress"
             app:useSimpleSummaryProvider="true"  />
 
     </PreferenceCategory>

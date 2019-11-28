@@ -97,6 +97,9 @@ public class SOSActivity extends  AppCompatActivity {
 
     ActionBar actionBar;
 
+    String maxRange;
+    String minRange;
+
     //firebase auth
     FirebaseAuth firebaseAuth;
 
@@ -202,7 +205,7 @@ public class SOSActivity extends  AppCompatActivity {
                     public void run() {
                         if (i == 1){
 
-                            sendSMS();
+                            sendSMS("SOS - wezwanie o pomoc");
                             sendMessage("SOS - wezwanie o pomoc");
 
                         } else if (i == 2){
@@ -256,8 +259,8 @@ public class SOSActivity extends  AppCompatActivity {
             // Code to run once
 
             new AlertDialog.Builder(context)
-                    .setTitle("Ustawienie numeru kontaktowego")
-                    .setMessage("W celu wysyłania na telefon nadzorcy alertu, zdefiniuj numery kontaktowe w zakładce 'ustawienia'")
+                    .setTitle("Ustawienie numeru kontaktowego i zakresu tętna")
+                    .setMessage("W celu wysyłania na telefon nadzorcy alertu, zdefiniuj numery kontaktowe oraz indywidualny zakres tęna w zakładce 'ustawienia'")
 
                     // Specifying a listener allows you to take an action before dismissing the dialog.
                     // The dialog is automatically dismissed when a dialog button is clicked.
@@ -303,16 +306,15 @@ public class SOSActivity extends  AppCompatActivity {
         }
     }
 
-    private void sendSMS() {
+    private void sendSMS(String SOSmessage) {
         String smsphoneNumber = DefaultSettings.getUserSMSNumber(context);
         if (ContextCompat.checkSelfPermission(SOSActivity.this,
                 Manifest.permission.SEND_SMS)  != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(SOSActivity.this,
                     new String[] {Manifest.permission.SEND_SMS}, REQUEST_SMS);
         } else {
-
             SmsManager mySmsManager = SmsManager.getDefault();
-            mySmsManager.sendTextMessage(smsphoneNumber, null, "SOS - wezwanie o pomoc", null, null);
+            mySmsManager.sendTextMessage(smsphoneNumber, null, SOSmessage, null, null);
             Toast.makeText(this, "Wiadmość SOS została wysłana", Toast.LENGTH_LONG).show();
         }
     }
@@ -327,7 +329,7 @@ public class SOSActivity extends  AppCompatActivity {
             }
         if (requestCode == REQUEST_SMS) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                sendSMS();
+                sendSMS("SOS - wezwanie o pomoc");
             } else {
                 Toast.makeText(this, "Permission denied", Toast.LENGTH_LONG).show();
             }
@@ -335,11 +337,6 @@ public class SOSActivity extends  AppCompatActivity {
        }
     }
 
-
-    public void ShowResults(View view){
-        //Intent intent = new Intent(this, DisplayMessageActivity.class);
-        //startActivity(intent);
-    }
     private void accessGoogleFit() {
         Fitness.getHistoryClient(this, GoogleSignIn.getLastSignedInAccount(this))
                 .readDailyTotal(DataType.TYPE_STEP_COUNT_DELTA)
@@ -525,6 +522,15 @@ public class SOSActivity extends  AppCompatActivity {
             Log.e(TAG, "SWWWWWEEEEEEEEEEEET"+value[1]);
             pulse = value[1];
             sendHRtoDB(pulse);
+            String minRange = DefaultSettings.getMinRange(context);
+            String maxRange = DefaultSettings.getMaxRange(context);
+            int minRangeInt = Integer.parseInt(minRange);
+            int maxRangeInt = Integer.parseInt(maxRange);
+            if((pulse!=0)&&((pulse<minRangeInt)|| (pulse>maxRangeInt))){
+               String info = "Uwaga! Tętno pacjenta wynosi : "+pulse;
+               sendMessage(info);
+               sendSMS(info);
+            }
         }
     };
         public void sendHRtoDB(int pulse) {
