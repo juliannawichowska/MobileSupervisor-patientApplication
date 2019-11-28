@@ -477,7 +477,8 @@ public class SOSActivity extends  AppCompatActivity {
             mDeviceAddress = result.getDevice().getAddress();
             mDeviceData = result.getScanRecord().getServiceData();
             Log.v("test", "ZNALZEZIONO" + mDeviceAddress);
-            if (mDeviceAddress.equals("F9:3C:B6:95:A4:1C")) {
+            String MACAddress = DefaultSettings.getMACAddress(context);
+            if (mDeviceAddress.equals(MACAddress)) {
                 Log.v("test", "ZNALZEZIONOooooooooooooooo" + mDeviceAddress);
                 MY_UUID = result.getScanRecord().getServiceUuids();
                 stopScanning();

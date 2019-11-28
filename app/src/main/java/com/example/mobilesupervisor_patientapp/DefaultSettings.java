@@ -34,8 +34,10 @@ public class DefaultSettings {
         getSharedPreferencesInstance(context);
         return sharedPreferences.getString("maxRange", "");
     }
-//    public static String getMACaddress(Context context) {
-//        getSharedPreferencesInstance(context);
-//        return sharedPreferences.getString("bleMAC", "");
-//    }
+
+    public static String getMACAddress(Context context) {
+        getSharedPreferencesInstance(context);
+        return sharedPreferences.getString("MACAddress", "");
+    }
+
 }

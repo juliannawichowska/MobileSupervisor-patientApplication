@@ -47,7 +47,7 @@
     <PreferenceCategory app:title="@string/bluetooth_header">
 
         <EditTextPreference
-            app:key="bleMAC"
+            app:key="MACAddress"
             app:title="@string/MACAddress"
             app:useSimpleSummaryProvider="true"  />
 
