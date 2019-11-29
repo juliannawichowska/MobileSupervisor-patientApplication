@@ -42,13 +42,13 @@
     <!-- Preference Titles -->
     <string name="alert_header">Alerty</string>
     <string name="bluetooth_header">Bluetooth</string>
-    <string name="pulse_header">Bluetooth</string>
+    <string name="results_header">Pomiary</string>
 
     <!-- Messages Preferences -->
     <string name="sms_title">Wysyłanie wiadomości SMS</string>
     <string name="call_title">Połączenia głosowe</string>
 
-    <!-- Pulse Preferences -->
+    <!-- Results Preferences -->
     <string name="minRange_title">Minimalny próg tętna</string>
     <string name="maxRange_title">Maksymalny próg tętna</string>
 

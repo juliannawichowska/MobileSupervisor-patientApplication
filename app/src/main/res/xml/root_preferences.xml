@@ -30,7 +30,7 @@
 
     </PreferenceCategory>
 
-    <PreferenceCategory app:title="@string/pulse_header">
+    <PreferenceCategory app:title="@string/results_header">
 
         <EditTextPreference
             app:key="minRange"

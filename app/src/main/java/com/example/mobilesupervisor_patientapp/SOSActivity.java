@@ -96,14 +96,12 @@ public class SOSActivity extends  AppCompatActivity {
     String mDeviceAddress = "F9:3C:B6:95:A4:1C";
 
     ActionBar actionBar;
-
-    String maxRange;
-    String minRange;
+    String SOSMessage = "SOS - wezwanie o pomoc";
 
     //firebase auth
     FirebaseAuth firebaseAuth;
 
-    int i = 0;
+    int countClicks = 0;
     private static final int REQUEST_CALL = 1;
     private static final int REQUEST_SMS = 1;
 
@@ -197,22 +195,18 @@ public class SOSActivity extends  AppCompatActivity {
         sosBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-                i ++;
+                countClicks ++;
                 Handler handler  = new Handler();
                 handler.postDelayed(new Runnable(){
                     @Override
                     public void run() {
-                        if (i == 1){
-
-                            sendSMS("SOS - wezwanie o pomoc");
-                            sendMessage("SOS - wezwanie o pomoc");
-
-                        } else if (i == 2){
-
+                        if (countClicks == 1){
+                            sendSMS(SOSMessage);
+                            sendMessage(SOSMessage);
+                        } else {
                             makePhoneCall();
                         }
-                        i = 0;
+                        countClicks = 0;
                     }
                 }, 500);
             }
@@ -259,8 +253,8 @@ public class SOSActivity extends  AppCompatActivity {
             // Code to run once
 
             new AlertDialog.Builder(context)
-                    .setTitle("Ustawienie numeru kontaktowego i zakresu tętna")
-                    .setMessage("W celu wysyłania na telefon nadzorcy alertu, zdefiniuj numery kontaktowe oraz indywidualny zakres tęna w zakładce 'ustawienia'")
+                    .setTitle("Ustawienia użytkownika")
+                    .setMessage("W celu wysyłania na telefon nadzorcy alertu, zdefiniuj numery kontaktowe oraz indywidualny zakres tęna w zakładce USTAWIENIA")
 
                     // Specifying a listener allows you to take an action before dismissing the dialog.
                     // The dialog is automatically dismissed when a dialog button is clicked.
@@ -329,7 +323,7 @@ public class SOSActivity extends  AppCompatActivity {
             }
         if (requestCode == REQUEST_SMS) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                sendSMS("SOS - wezwanie o pomoc");
+                sendSMS(SOSMessage);
             } else {
                 Toast.makeText(this, "Permission denied", Toast.LENGTH_LONG).show();
             }
@@ -528,9 +522,9 @@ public class SOSActivity extends  AppCompatActivity {
             int minRangeInt = Integer.parseInt(minRange);
             int maxRangeInt = Integer.parseInt(maxRange);
             if((pulse!=0)&&((pulse<minRangeInt)|| (pulse>maxRangeInt))){
-               String info = "Uwaga! Tętno pacjenta wynosi : "+pulse;
-               sendMessage(info);
-               sendSMS(info);
+               String pulseInfo = "Uwaga! Tętno pacjenta wynosi : "+pulse;
+               sendMessage(pulseInfo);
+               sendSMS(pulseInfo);
             }
         }
     };
