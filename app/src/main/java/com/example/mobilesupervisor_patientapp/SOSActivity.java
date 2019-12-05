@@ -75,11 +75,11 @@ public class SOSActivity extends  AppCompatActivity {
 
     BluetoothManager btManager;
     BluetoothAdapter btAdapter;
-    BluetoothDevice mBluetoothDevice;
+    public static BluetoothDevice mBluetoothDevice;
     public BluetoothGatt mBluetoothGatt;
     private static final int STATE_CONNECTED = 2;
     public static List<ParcelUuid> MY_UUID;
-    UUID CLIENT_CHARACTERISTIC_CONFIG_UUID, HEART_RATE_SERVICE_UUID, HEART_RATE_MEASUREMENT_CHAR_UUID, HEART_RATE_CONTROL_POINT_CHAR_UUID;
+    public static UUID CLIENT_CHARACTERISTIC_CONFIG_UUID, HEART_RATE_SERVICE_UUID, HEART_RATE_MEASUREMENT_CHAR_UUID, HEART_RATE_CONTROL_POINT_CHAR_UUID, TEMP_UUID, STEPS_UUID;
 
     private final static int REQUEST_ENABLE_BT = 1;
     private static final int PERMISSION_REQUEST_COARSE_LOCATION = 1;
@@ -93,7 +93,7 @@ public class SOSActivity extends  AppCompatActivity {
     GoogleSignInAccount account;
     String myUid;
     MainActivity mainActivity = new MainActivity();
-    String mDeviceAddress = "F9:3C:B6:95:A4:1C";
+    public static String mDeviceAddress = "F9:3C:B6:95:A4:1C";
 
     ActionBar actionBar;
     String SOSMessage = "SOS - wezwanie o pomoc";
@@ -116,6 +116,8 @@ public class SOSActivity extends  AppCompatActivity {
         HEART_RATE_MEASUREMENT_CHAR_UUID = convertFromInteger(0x2A37);
         HEART_RATE_CONTROL_POINT_CHAR_UUID = convertFromInteger(0x2A39);
         CLIENT_CHARACTERISTIC_CONFIG_UUID = convertFromInteger(0x2902);
+        TEMP_UUID=UUID.fromString("0000fee0-0000-1000-8000-00805f9b34fb");
+        STEPS_UUID=UUID.fromString("00000006-0000-3512-2118-0009af100700");
         context = this;
 
         sendChat = findViewById(R.id.sendChat);
@@ -174,7 +176,7 @@ public class SOSActivity extends  AppCompatActivity {
 
         }
         else {
-            accessGoogleFit();
+            //accessGoogleFit();
         }
 
 
@@ -337,49 +339,15 @@ public class SOSActivity extends  AppCompatActivity {
                 .addOnSuccessListener(new OnSuccessListener<DataSet>() {
                     @Override
                     public void onSuccess(DataSet dataSet) {
-                        Log.i(TAG, "Successfully subscribed");
                         total = dataSet.isEmpty() ? 0 : dataSet.getDataPoints().get(0).getValue(Field.FIELD_STEPS).asInt();
-                        Log.i(TAG, "Total steps: " + total);
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Log.i(TAG, "Problem and not subscribed");
+                        total=0;
                     }
                 });
-        final OnDataPointListener heartRateListener = new OnDataPointListener() {
-            @Override
-            public void onDataPoint(DataPoint dataPoint) {
-                Log.i(TAG, "JESTEM TU");
-                for (Field field : dataPoint.getDataType().getFields()) {
-                    Value val = dataPoint.getValue(field);
-                    Log.i(TAG, "Detected DataPoint field: " + field.getName());
-                    Log.i(TAG, "Detected DataPoint value: " + val);
-                }
-            }
-        };
-        Fitness.getSensorsClient(this, GoogleSignIn.getLastSignedInAccount(this))
-                .add(
-                        new SensorRequest.Builder()
-                        .setDataType(DataType.TYPE_HEART_RATE_BPM)
-                        .setSamplingRate(1, TimeUnit.MINUTES)
-                        .build(),
-                        heartRateListener
-                )
-                .addOnCompleteListener(
-                        new OnCompleteListener<Void>() {
-                            @Override
-                            public void onComplete(@NonNull Task<Void> task) {
-                                if (task.isSuccessful()) {
-                                    Log.i(TAG, "LISTENER COMPLETED");
-                                }
-                                else {
-                                    Log.i(TAG, "LISTENER NOT COMPLETED", task.getException());
-                                }
-                            }
-                        }
-                );
     }
 
     private void sendMessage (String message) {
@@ -470,16 +438,16 @@ public class SOSActivity extends  AppCompatActivity {
             mBluetoothDevice = result.getDevice();
             mDeviceAddress = result.getDevice().getAddress();
             mDeviceData = result.getScanRecord().getServiceData();
-            Log.v("test", "ZNALZEZIONO" + mDeviceAddress);
             String MACAddress = DefaultSettings.getMACAddress(context);
             if (mDeviceAddress.equals(MACAddress)) {
-                Log.v("test", "ZNALZEZIONOooooooooooooooo" + mDeviceAddress);
+                Toast.makeText(SOSActivity.this, "Znaleziono smartband", Toast.LENGTH_LONG).show();
                 MY_UUID = result.getScanRecord().getServiceUuids();
                 stopScanning();
                 connect();
             }
         }
     };
+
     BluetoothGattCallback mGattCallback  = new BluetoothGattCallback() {
         public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
             if (newState == STATE_CONNECTED) {
@@ -487,34 +455,32 @@ public class SOSActivity extends  AppCompatActivity {
             }
         }
         public void onServicesDiscovered(BluetoothGatt gatt, int status) {
+            BluetoothGattCharacteristic steps_charac = gatt.getService(TEMP_UUID).getCharacteristic(STEPS_UUID);
+            gatt.setCharacteristicNotification(steps_charac, true);
+            try {
+                byte[] value = steps_charac.getValue();
+                total = value[1]+value[2]
+;            }
+            catch (Exception e){
+                accessGoogleFit();
+            }
             BluetoothGattCharacteristic characteristic =
                     gatt.getService(HEART_RATE_SERVICE_UUID)
                             .getCharacteristic(HEART_RATE_MEASUREMENT_CHAR_UUID);
             gatt.setCharacteristicNotification(characteristic, true);
             BluetoothGattDescriptor descriptor = characteristic.getDescriptor(CLIENT_CHARACTERISTIC_CONFIG_UUID);
-//            descriptor.setValue(BluetoothGattDescriptor.ENABLE_INDICATION_VALUE);
             descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
             gatt.writeDescriptor(descriptor);
-
         }
-        public void onCharacteristicRead(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
-            super.onCharacteristicRead(gatt, characteristic, status);
-            final Integer batteryLevel = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 0);
 
-            if (batteryLevel != null) {
-                Log.d(TAG, "battery level: " + batteryLevel);
-            }
-        }
         public void onDescriptorWrite(BluetoothGatt gatt, BluetoothGattDescriptor descriptor, int status) {
-
-            Log.e(TAG, "SWWWWWEEEEEEEEEEEETstatus"+status);
             BluetoothGattCharacteristic characteristic = gatt.getService(HEART_RATE_SERVICE_UUID).getCharacteristic(HEART_RATE_CONTROL_POINT_CHAR_UUID);
             characteristic.setValue(new byte[] {1,1});
             gatt.writeCharacteristic(characteristic);
         }
+
         public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
             byte[] value = characteristic.getValue();
-            Log.e(TAG, "SWWWWWEEEEEEEEEEEET"+value[1]);
             pulse = value[1];
             sendHRtoDB(pulse);
             String minRange = DefaultSettings.getMinRange(context);
@@ -528,6 +494,7 @@ public class SOSActivity extends  AppCompatActivity {
             }
         }
     };
+
         public void sendHRtoDB(int pulse) {
             final DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("Results");
             Map<String, Object> Pulse = new HashMap<>();

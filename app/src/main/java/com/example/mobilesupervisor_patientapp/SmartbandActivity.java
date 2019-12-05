@@ -1,5 +1,13 @@
 package com.example.mobilesupervisor_patientapp;
 
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothGatt;
+import android.bluetooth.BluetoothGattCallback;
+import android.bluetooth.BluetoothGattCharacteristic;
+import android.bluetooth.BluetoothGattDescriptor;
+import android.bluetooth.BluetoothManager;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -22,9 +30,10 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+/*
 
+ */
 public class SmartbandActivity extends FragmentActivity {
-    private static final String TAG = "SMARTBAND";
     private long totalSteps;
     FirebaseUser firebaseUser;
     Button checkBox, checkBox2, checkBox3, checkBox4, checkBox5;
@@ -36,7 +45,6 @@ public class SmartbandActivity extends FragmentActivity {
         totalSteps = SOSActivity.total;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_smartband);
-        Log.i(TAG, "SMARTBAND STEPS: "+totalSteps);
         TextView stepsCount = (TextView)findViewById(R.id.textView3);
         stepsCount.setText(String.valueOf(totalSteps));
         TextView info = (TextView)findViewById(R.id.textView2);
@@ -93,7 +101,6 @@ public class SmartbandActivity extends FragmentActivity {
                 startActivity(a);
             }
         });
-
     }
 
     private void makeStepsOutput(long Steps, TextView info) {
